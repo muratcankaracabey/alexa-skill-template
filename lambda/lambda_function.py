@@ -6,6 +6,8 @@
 # This sample is built using the handler classes approach in skill builder.
 import logging
 import ask_sdk_core.utils as ask_utils
+import requests
+
 
 from ask_sdk_core.skill_builder import SkillBuilder
 from ask_sdk_core.dispatch_components import AbstractRequestHandler
@@ -17,6 +19,20 @@ from ask_sdk_model import Response
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
+END_POINT = "" # the end point for the API
+
+
+def get_category_names():
+    result = requests.get(f"{END_POINT}/getcategories").json()
+    category_names = [cat['name'] for cat in result]
+    category_names = category_names[:-1] + ["and"] + [category_names[-1]]
+    return category_names
+
+
+def get_category_value(category):
+    result = requests.get(f"{END_POINT}/getcategory/{category}").json()
+    return result["value"]
+
 
 class LaunchRequestHandler(AbstractRequestHandler):
     """Handler for Skill Launch."""
@@ -27,8 +43,8 @@ class LaunchRequestHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
-        speak_output = "Welcome, you can say Hello or Help. Which would you like to try?"
-
+        
+        speak_output = "Welcome, you can say Hello or Help. You can also ask for categories. Which would you like to try?"
         return (
             handler_input.response_builder
                 .speak(speak_output)
@@ -43,10 +59,50 @@ class HelloWorldIntentHandler(AbstractRequestHandler):
         # type: (HandlerInput) -> bool
         return ask_utils.is_intent_name("HelloWorldIntent")(handler_input)
 
+
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
-        speak_output = "Hello World!"
 
+        speak_output = "Hello World!"
+        return (
+            handler_input.response_builder
+                .speak(speak_output)
+                # .ask("add a reprompt if you want to keep the session open for the user to respond")
+                .response
+        )
+
+
+class GetCategoriesIntentHandler(AbstractRequestHandler):
+    """Handler for Hello World Intent."""
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
+        return ask_utils.is_intent_name("GetCategories")(handler_input)
+
+
+    def handle(self, handler_input):
+        # type: (HandlerInput) -> Response
+
+        speak_output = f"Our categories are {' '.join(get_category_names())}"
+        return (
+            handler_input.response_builder
+                .speak(speak_output)
+                # .ask("add a reprompt if you want to keep the session open for the user to respond")
+                .response
+        )
+
+
+class GetCategoryValueIntentHandler(AbstractRequestHandler):
+    """Handler for Hello World Intent."""
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
+        return ask_utils.is_intent_name("GetCategory")(handler_input)
+
+    def handle(self, handler_input):
+        # type: (HandlerInput) -> Response
+        slots = handler_input.request_envelope.request.intent.slots
+        category_value = get_category_value(slots["category"].value)
+
+        speak_output = f"The value of the category is {category_value}"
         return (
             handler_input.response_builder
                 .speak(speak_output)
@@ -159,6 +215,8 @@ sb = SkillBuilder()
 
 sb.add_request_handler(LaunchRequestHandler())
 sb.add_request_handler(HelloWorldIntentHandler())
+sb.add_request_handler(GetCategoryValueIntentHandler())
+sb.add_request_handler(GetCategoriesIntentHandler())
 sb.add_request_handler(HelpIntentHandler())
 sb.add_request_handler(CancelOrStopIntentHandler())
 sb.add_request_handler(SessionEndedRequestHandler())

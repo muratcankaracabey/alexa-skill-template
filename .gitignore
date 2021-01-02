@@ -1,0 +1,5 @@
+lambda/node_modules
+.ask/
+ask-resources.json
+__pycache__
+.vscode

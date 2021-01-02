@@ -1,0 +1,60 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "youtube",
+      "intents": [
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "name": "HelloWorldIntent",
+          "slots": [],
+          "samples": [
+            "hello",
+            "how are you",
+            "say hi world",
+            "say hi",
+            "hi",
+            "say hello world",
+            "say hello"
+          ]
+        },
+        {
+          "name": "AMAZON.NavigateHomeIntent",
+          "samples": []
+        },
+        {
+          "name": "GetCategory",
+          "slots": [
+            {
+              "name": "category",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "get {category}"
+          ]
+        },
+        {
+          "name": "GetCategories",
+          "slots": [],
+          "samples": [
+            "categories",
+            "get categories"
+          ]
+        }
+      ],
+      "types": []
+    }
+  },
+  "version": "7"
+}
